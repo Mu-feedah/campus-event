@@ -43,16 +43,32 @@ const events = [
     tagColor: "bg-emerald-100 text-emerald-800",
   },
 ];
+const categories = [
+  "All Events",
+  "Technology",
+  "Entertainment",
+  "Sports",
+  "Workshop",
+  "Academic",
+  "Business",
+];
 
 export default function Home() {
   const [registered, setRegistered] = useState<number[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All Events");
 
-  const filteredEvents = events.filter((event) =>
-    `${event.title} ${event.category} ${event.venue}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const filteredEvents = events.filter((event) => {
+  const matchesSearch = `${event.title} ${event.category} ${event.venue}`
+    .toLowerCase()
+    .includes(search.toLowerCase());
+
+  const matchesCategory =
+    selectedCategory === "All Events" ||
+    event.category === selectedCategory;
+
+  return matchesSearch && matchesCategory;
+});
 
   return (
     <main className="min-h-screen bg-[#f4f7fa] text-[#14213d]">
