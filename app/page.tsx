@@ -191,7 +191,35 @@ export default function Home() {
             />
           </div>
         </div>
-
+<div className="flex flex-wrap gap-3 mb-8">
+  {categories.map((category) => (
+    <button
+      key={category}
+      onClick={() => setSelectedCategory(category)}
+      className={`px-5 py-3 rounded-full text-sm font-semibold transition ${
+        selectedCategory === category
+          ? "bg-[#101d35] text-white"
+          : "bg-white text-slate-600 border border-slate-200 hover:border-[#20d6c2]"
+      }`}
+    >
+      {category}
+    </button>
+  ))}
+</div><div className="flex flex-wrap gap-3 mb-8">
+  {categories.map((category) => (
+    <button
+      key={category}
+      onClick={() => setSelectedCategory(category)}
+      className={`px-5 py-3 rounded-full text-sm font-semibold transition ${
+        selectedCategory === category
+          ? "bg-[#101d35] text-white"
+          : "bg-white text-slate-600 border border-slate-200 hover:border-[#20d6c2]"
+      }`}
+    >
+      {category}
+    </button>
+  ))}
+</div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredEvents.map((event) => (
             <article
