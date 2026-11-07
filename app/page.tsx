@@ -1,48 +1,9 @@
 "use client";
-
+import Link from "next/link";
 import { useState } from "react";
 
-const events = [
-  {
-    id: 1,
-    title: "Tech Innovation Summit",
-    category: "Technology",
-    date: "NOV 14",
-    time: "10:00 AM",
-    venue: "University Auditorium",
-    description:
-      "Discover new ideas, connect with innovators and explore the future of technology.",
-    image:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900",
-    tagColor: "bg-cyan-100 text-cyan-800",
-  },
-  {
-    id: 2,
-    title: "Campus Music Festival",
-    category: "Entertainment",
-    date: "NOV 18",
-    time: "4:00 PM",
-    venue: "University Sports Ground",
-    description:
-      "Experience great music, amazing performances and unforgettable campus moments.",
-    image:
-      "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=900",
-    tagColor: "bg-orange-100 text-orange-800",
-  },
-  {
-    id: 3,
-    title: "Career Development Workshop",
-    category: "Workshop",
-    date: "NOV 22",
-    time: "11:00 AM",
-    venue: "Faculty Conference Hall",
-    description:
-      "Meet professionals, develop new skills and prepare for exciting career opportunities.",
-    image:
-      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900",
-    tagColor: "bg-emerald-100 text-emerald-800",
-  },
-];
+import {events} from "./eventsData"
+import { useSavedEvents } from "./SavedEventsContext";
 const categories = [
   "All Events",
   "Technology",
@@ -54,9 +15,12 @@ const categories = [
 ];
 
 export default function Home() {
+  const { savedEventIds, toggleSavedEvent } = useSavedEvents();
   const [registered, setRegistered] = useState<number[]>([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Events");
+
+const [sortOrder, setSortOrder] = useState("upcoming");
 
   const filteredEvents = events.filter((event) => {
   const matchesSearch = `${event.title} ${event.category} ${event.venue}`
@@ -69,7 +33,11 @@ export default function Home() {
 
   return matchesSearch && matchesCategory;
 });
-
+const sortedEvents = [...filteredEvents].sort((a, b) => {
+  return sortOrder === "upcoming"
+    ? a.sortDate.localeCompare(b.sortDate)
+    : b.sortDate.localeCompare(a.sortDate);
+});
   return (
     <main className="min-h-screen bg-[#f4f7fa] text-[#14213d]">
       {/* Navigation */}
@@ -79,6 +47,12 @@ export default function Home() {
             CAMPUS<span className="text-[#20d6c2]">EVENTS</span>
             <span className="text-orange-400">.</span>
           </a>
+          <Link
+  href="/my-events"
+  className="rounded-full bg-[#20d6c2] px-5 py-2 font-semibold text-[#101d35] hover:opacity-80 transition"
+>
+  My Events
+</Link>
 
           <div className="hidden md:flex items-center gap-9 text-sm text-slate-300">
             <a href="#" className="text-white hover:text-[#20d6c2]">
@@ -220,12 +194,21 @@ export default function Home() {
     </button>
   ))}
 </div>
+<div className="flex justify-end mb-6">
+  <select
+    value={sortOrder}
+    onChange={(e) => setSortOrder(e.target.value)}
+    className="border border-slate-300 rounded-lg px-4 py-3 text-sm bg-white"
+  >
+    <option value="upcoming">Upcoming first</option>
+    <option value="latest">Latest first</option>
+  </select>
+</div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredEvents.map((event) => (
-            <article
-              key={event.id}
-              className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300"
-            >
+          {sortedEvents.map((event) => (
+      
+            <article key={event.id} className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition duration-300">
+            
               <div className="relative overflow-hidden">
                 <img
                   src={event.image}
@@ -256,14 +239,24 @@ export default function Home() {
                   <span>📍 {event.venue}</span>
                 </div>
 
-                <h3 className="text-xl font-black mb-3">
-                  {event.title}
-                </h3>
+                <h3 className="...">
+  <Link href={`/events/${event.id}`}>
+    {event.title}
+  </Link>
+</h3>
 
                 <p className="text-slate-500 text-sm leading-7 min-h-[72px]">
                   {event.description}
                 </p>
 
+<button
+  onClick={() => toggleSavedEvent(event.id)}
+  className="mt-4 w-full rounded-xl bg-[#101d35] px-4 py-3 text-white hover:bg-[#20d6c2] transition"
+>
+  {savedEventIds.includes(event.id)
+    ? "Remove from My Events"
+    : "Save Event"}
+</button>
                 <button
                   onClick={() =>
                     setRegistered((previous) =>
@@ -281,6 +274,8 @@ export default function Home() {
                 </button>
               </div>
             </article>
+          
+            
           ))}
         </div>
 
